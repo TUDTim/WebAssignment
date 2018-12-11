@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Mode vs PlayerName</title>
+    <link href="stylesheets/style.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Rajdhani" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" charset="utf-8"></script>
+</head>
+
+<body>
+    <main>
+        <div id="board">
+            <table id="pintable"></table>
+            <div id="indicator">
+                <table id="indicatortable"></table>
+            </div>
+            <div id="submitbuttoncontainer">
+                <div id="submitbutton">Submit</div>
+            </div>
+        </div>
+        <div id="colors">
+            <table id="colortable">
+                <tr>
+                    <td id="navy" style="background-color:var(--navy);"></td>
+                    <td id="green" style="background-color:var(--green);"></td>
+                    <td id="yellow" style="background-color:var(--yellow);"></td>
+                    <td id="orange" style="background-color:var(--orange);"></td>
+                </tr>
+                <tr>
+                    <td id="red" style="background-color:var(--red);"></td>
+                    <td id="blue" style="background-color:var(--blue);"></td>
+                    <td id="purple" style="background-color:var(--purple);"></td>
+                    <td id="teal" style="background-color:var(--teal);"></td>
+                </tr>
+            </table>
+            </section>
+    </main>
+
+    <script src="javascripts/board.js"></script>
+    <script src="javascripts/gamestate.js"></script>
+</body>
+
+</html>
