@@ -14,11 +14,11 @@ var gameSetup = function () {
 
     gameState.addGuess("green", "red", "green", "purple");
 
-    gameState.addIndication(1,1);
+    gameState.addIndication(1, 1);
 
     gameState.addGuess("blue", "red", "green", "purple");
 
-    gameState.addIndication(2,1);
+    gameState.addIndication(2, 1);
 
     console.log(gameState.getIndication(3));
 
@@ -36,10 +36,8 @@ var gameSetup = function () {
         $("#indicatortable").append("<tr id='row" + r + "'>" + indicatorcell + "</tr>");
     }
 
-
     showGuesses();
     showIndications();
-
 
 
     var colorTable = document.getElementById("colortable");
@@ -69,7 +67,7 @@ var gameSetup = function () {
         var activeRow = 8 - gameState.getguessAmount();
         console.log(activeRow);
         getRowColorCode(activeRow);
-        console.log(gameState.getGuess(gameState.getguessAmount()-1));
+        console.log(gameState.getGuess(gameState.getguessAmount() - 1));
 
     });
 
@@ -132,11 +130,11 @@ var setColor = function (element, color) {
 
 var getColor = function (element) {
     var colorString = element.style.backgroundColor;
-    return colorString.slice(6,-1);
+    return colorString.slice(6, -1);
 }
 
 
-var showIndications = function() {
+var showIndications = function () {
     var index = 0;
     var rowcount = 8;
 
@@ -151,10 +149,10 @@ var showIndications = function() {
         }
 
         for (var i = 0; i < numWhite; i++) {
-            var white = document.getElementById("indicator" + String(4 * rowcount - (3 - (i + numBlack ))));
+            var white = document.getElementById("indicator" + String(4 * rowcount - (3 - (i + numBlack))));
             white.style.visibility = "visible";
         }
-    
+
 
         index++;
         rowcount--;
@@ -162,7 +160,7 @@ var showIndications = function() {
 }
 
 
-var getRowColorCode = function(activeRow) {
+var getRowColorCode = function (activeRow) {
     var pin1 = document.getElementById("pin" + String(4 * activeRow - 3));
     var pin2 = document.getElementById("pin" + String(4 * activeRow - 2));
     var pin3 = document.getElementById("pin" + String(4 * activeRow - 1));
