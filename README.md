@@ -1,2 +1,0 @@
-# WebAssignment
-Master Mind Boardgame
