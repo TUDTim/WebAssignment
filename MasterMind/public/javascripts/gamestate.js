@@ -2,6 +2,7 @@ var gameState = (function() {
     var guessAmount = 0;
     var guesses = [];
     var colorCode = {c1:null,c2:null,c3:null,c4:null};
+    var indications = []
 
     return {
         getColorCode : function(){
@@ -22,9 +23,14 @@ var gameState = (function() {
         },
         getGuess : function(guessNumber){
             return guesses[guessNumber];
+        }, 
+        addIndication : function(numblack, numwhite) {
+            indications[guessAmount - 1] = {black: numblack, white: numwhite};
+        },
+        getIndication : function(indicationNumber) {
+            return indications[indicationNumber];
         }
-        
-    }
+    };
 })();
 
 

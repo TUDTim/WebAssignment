@@ -6,11 +6,21 @@ var gameSetup = function () {
 
     gameState.addGuess("navy", "red", "green", "purple");
 
+    gameState.addIndication(1, 1);
+
     gameState.addGuess("navy", "red", "green", "teal");
+
+    gameState.addIndication(0, 1);
 
     gameState.addGuess("green", "red", "green", "purple");
 
+    gameState.addIndication(1,1);
+
     gameState.addGuess("blue", "red", "green", "purple");
+
+    gameState.addIndication(2,1);
+
+    console.log(gameState.getIndication(3));
 
     for (var r = 0; r < 8; r++) {
         var boardcell = "";
@@ -18,7 +28,7 @@ var gameSetup = function () {
 
         for (var c = 0; c < 4; c++) {
             boardcell += "<td id='pin" + space + "' data-pos='" + space + "'></td>";
-            indicatorcell += "<td data-pos='" + space + "'></td>";
+            indicatorcell += "<td id='indicator" + space + "' data-pos='" + space + "'></td>";
             space++;
         }
 
@@ -28,6 +38,7 @@ var gameSetup = function () {
 
 
     showGuesses();
+    showIndications();
 
 
 
@@ -55,6 +66,10 @@ var gameSetup = function () {
     var submitButton = document.getElementById("submitbutton");
 
     submitButton.addEventListener("click", function () {
+        var activeRow = 8 - gameState.getguessAmount();
+        console.log(activeRow);
+        getRowColorCode(activeRow);
+        console.log(gameState.getGuess(gameState.getguessAmount()-1));
 
     });
 
@@ -80,9 +95,8 @@ var showGuesses = function () {
     var rowcount = 8;
     while (gameState.getGuess(index) != null) {
         var colorCode = gameState.getGuess(index);
-        for (var c = 0; c < 4; c++) {
 
-        }
+
         var pin1 = document.getElementById("pin" + String(4 * rowcount - 3));
         var pin2 = document.getElementById("pin" + String(4 * rowcount - 2));
         var pin3 = document.getElementById("pin" + String(4 * rowcount - 1));
@@ -114,4 +128,45 @@ var showPin = function (element) {
 
 var setColor = function (element, color) {
     element.style.backgroundColor = "var(--" + color + ")";
+}
+
+var getColor = function (element) {
+    var colorString = element.style.backgroundColor;
+    return colorString.slice(6,-1);
+}
+
+
+var showIndications = function() {
+    var index = 0;
+    var rowcount = 8;
+
+    while (gameState.getIndication(index) != null) {
+        var numBlack = gameState.getIndication(index).black;
+        var numWhite = gameState.getIndication(index).white;
+
+        for (var i = 0; i < numBlack; i++) {
+            var black = document.getElementById("indicator" + String(4 * rowcount - (3 - i)));
+            black.style.backgroundColor = "#67727A";
+            black.style.visibility = "visible";
+        }
+
+        for (var i = 0; i < numWhite; i++) {
+            var white = document.getElementById("indicator" + String(4 * rowcount - (3 - (i + numBlack ))));
+            white.style.visibility = "visible";
+        }
+    
+
+        index++;
+        rowcount--;
+    }
+}
+
+
+var getRowColorCode = function(activeRow) {
+    var pin1 = document.getElementById("pin" + String(4 * activeRow - 3));
+    var pin2 = document.getElementById("pin" + String(4 * activeRow - 2));
+    var pin3 = document.getElementById("pin" + String(4 * activeRow - 1));
+    var pin4 = document.getElementById("pin" + String(4 * activeRow));
+
+    gameState.addGuess(getColor(pin1), getColor(pin2), getColor(pin3), getColor(pin4));
 }

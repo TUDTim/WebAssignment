@@ -81,6 +81,7 @@ table {
   height: 18px;
   border-radius: 50%;
   display: inline-block;
+  visibility: hidden;
   border: 1px solid #67727A;
 }
 
