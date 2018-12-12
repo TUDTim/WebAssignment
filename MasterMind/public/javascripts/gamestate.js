@@ -32,9 +32,7 @@ var gameState = (function () {
                         if (guessColor == ccColor) {
                             numwhite++;
                             g['c'+ (gi+1)] = null; 
-                            cc['c'+ (cci+1)] = null;
-                            console.log(g);
-                            console.log(cc);                        }
+                            cc['c'+ (cci+1)] = null;                      }
                     }
                 }
             }
@@ -60,7 +58,6 @@ var gameState = (function () {
             guess = { c1: color1, c2: color2, c3: color3, c4: color4 }
             guesses[guessAmount] = guess;
             indications[guessAmount] = addIndication(guess);
-            // console.log(indications);
             guessAmount++;
         },
         getGuess: function (guessNumber) {
