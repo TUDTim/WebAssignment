@@ -4,6 +4,7 @@ var game = (function(gameID, playerA, playerB) {
     let id = gameID;
     var codeA = null;
     var codeB = null;
+    var gameResult = null;
     
 
     return {
@@ -16,10 +17,10 @@ var game = (function(gameID, playerA, playerB) {
         getGameID : function() {
             return this.gameID;
         },
-        getCodeA : function() {
+        compareToCodeA : function(guess) {
             return codeA;
         },
-        getCodeB : function() {
+        compareToCodeB : function(guess) {
             return codeB;
         },
         setCodeA : function(color1, color2, color3, color4) {
