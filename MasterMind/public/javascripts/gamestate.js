@@ -6,41 +6,40 @@ var gameState = (function () {
 
 
     var addIndication = function (guess) {
-        var g = guess;
-        var cc = colorCode;
-
+        var g = JSON.parse(JSON.stringify(guess));
+        var cc = JSON.parse(JSON.stringify(colorCode));
+        
         var numblack = 0;
         var numwhite = 0;
 
-// Count for black
-
+        // Count for black
         for (var i = 0; i < 4; i++) {
-            console.log(Object.entries(g)[i][1] + " " + Object.entries(cc)[i][1]);
             if (Object.entries(g)[i][1] == Object.entries(cc)[i][1]) {
-                console.log("point reached");
                 numblack++;
-                Object.entries(g)[i][1] = null;
-                Object.entries(cc)[i][1] = null;
+                Object.values(g)[i][1] = "";
+                Object.values(cc)[i][1] = "";
+                g['c'+ (i+1)] = null; 
+                cc['c'+ (i+1)] = null;
             }
         }
-        console.log(numblack);
-// Count for white
+        // Count for white
         for (var gi = 0; gi < 4; gi++) {
             var guessColor = Object.entries(g)[gi][1];
             if (guessColor != null) {
                 for (var cci = 0; cci < 4; cci++) {
                     var ccColor = Object.entries(cc)[cci][1];
                     if (gi != cci) {
-                        if (guessColor == ccColor){
+                        if (guessColor == ccColor) {
                             numwhite++;
-                        }
+                            g['c'+ (gi+1)] = null; 
+                            cc['c'+ (cci+1)] = null;
+                            console.log(g);
+                            console.log(cc);                        }
                     }
-                    Object.entries(g)[gi][1] = null;
-                    Object.entries(cc)[cci][1] = null;
                 }
             }
         }
-        return {black: numblack, white: numwhite};
+        return { black: numblack, white: numwhite };
     }
 
 
@@ -61,6 +60,7 @@ var gameState = (function () {
             guess = { c1: color1, c2: color2, c3: color3, c4: color4 }
             guesses[guessAmount] = guess;
             indications[guessAmount] = addIndication(guess);
+            // console.log(indications);
             guessAmount++;
         },
         getGuess: function (guessNumber) {

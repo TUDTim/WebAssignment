@@ -9,10 +9,11 @@ var gameSetup = function () {
 
     gameState.addGuess("navy", "red", "green", "teal");
 
+    gameState.addGuess( "navy","green", "yellow", "orange");
 
     gameState.addGuess("green", "red", "green", "purple");
 
-
+    gameState.addGuess("red", "navy", "navy", "blue");
 
     gameState.addGuess("blue", "red", "green", "purple");
 
