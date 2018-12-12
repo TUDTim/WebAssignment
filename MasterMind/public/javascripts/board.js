@@ -6,19 +6,16 @@ var gameSetup = function () {
 
     gameState.addGuess("navy", "red", "green", "purple");
 
-    gameState.addIndication(1, 1);
 
     gameState.addGuess("navy", "red", "green", "teal");
 
-    gameState.addIndication(0, 1);
 
     gameState.addGuess("green", "red", "green", "purple");
 
-    gameState.addIndication(1, 1);
+
 
     gameState.addGuess("blue", "red", "green", "purple");
 
-    gameState.addIndication(2, 1);
 
     console.log(gameState.getIndication(3));
 
@@ -66,9 +63,10 @@ var gameSetup = function () {
     submitButton.addEventListener("click", function () {
         var activeRow = 8 - gameState.getguessAmount();
         console.log(activeRow);
-        getRowColorCode(activeRow);
-        console.log(gameState.getGuess(gameState.getguessAmount() - 1));
-
+        var guess = getRowColorCode(activeRow);
+        console.log(guess);
+        gameState.addGuess(guess);
+        submitButton.style.display = "none";
     });
 
     submitButton.addEventListener("mouseover", function () {

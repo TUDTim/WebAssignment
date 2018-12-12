@@ -5,34 +5,43 @@ var gameState = (function () {
     var indications = []
 
 
-    // var setIndications = function () {
-    //     var numblack;
-    //     var numwhite;
-    //     for (var i = 0; i < guesses.length; i++) {
-    //         var ccg = guesses[i];
-    //         var cc = colorCode
-    //         console.log(Object.entries(ccg));
-    //         for (var i = 0; i < 4; i++) {
-    //             if (Object.entries(ccg)[i][1] == Object.entries(cc)[i][1]) {
-    //                 Object.entries(ccg)[i][1] = "";
-    //                 numblack++
-    //             }
-    //         }
-    //         for (var iccg = 0; iccg < 4; iccg++) {
-    //             for (var icc = 0; icc < 4; icc++) {
-    //                 if (iccg != icc) {
-    //                     if (Object.entries(ccg)[iccg][1] == Object.entries(cc)[icc][1]) {
-    //                         Object.entries(ccg)[iccg][1] = "";
-    //                         numwhite++
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //         indications[i] = {black: numblack,white: numwhite};
+    var addIndication = function (guess) {
+        var g = guess;
+        var cc = colorCode;
 
-    //     };
-    // };
+        var numblack = 0;
+        var numwhite = 0;
 
+// Count for black
+
+        for (var i = 0; i < 4; i++) {
+            console.log(Object.entries(g)[i][1] + " " + Object.entries(cc)[i][1]);
+            if (Object.entries(g)[i][1] == Object.entries(cc)[i][1]) {
+                console.log("point reached");
+                numblack++;
+                Object.entries(g)[i][1] = null;
+                Object.entries(cc)[i][1] = null;
+            }
+        }
+        console.log(numblack);
+// Count for white
+        for (var gi = 0; gi < 4; gi++) {
+            var guessColor = Object.entries(g)[gi][1];
+            if (guessColor != null) {
+                for (var cci = 0; cci < 4; cci++) {
+                    var ccColor = Object.entries(cc)[cci][1];
+                    if (gi != cci) {
+                        if (guessColor == ccColor){
+                            numwhite++;
+                        }
+                    }
+                    Object.entries(g)[gi][1] = null;
+                    Object.entries(cc)[cci][1] = null;
+                }
+            }
+        }
+        return {black: numblack, white: numwhite};
+    }
 
 
     return {
@@ -49,14 +58,13 @@ var gameState = (function () {
             return guessAmount;
         },
         addGuess: function (color1, color2, color3, color4) {
-            guesses[guessAmount] = { c1: color1, c2: color2, c3: color3, c4: color4 };
+            guess = { c1: color1, c2: color2, c3: color3, c4: color4 }
+            guesses[guessAmount] = guess;
+            indications[guessAmount] = addIndication(guess);
             guessAmount++;
         },
         getGuess: function (guessNumber) {
             return guesses[guessNumber];
-        },
-        addIndication: function (numblack, numwhite) {
-            indications[guessAmount - 1] = {black: numblack, white: numwhite };
         },
         getIndication: function (indicationNumber) {
             return indications[indicationNumber];

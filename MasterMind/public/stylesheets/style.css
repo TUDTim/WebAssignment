@@ -105,7 +105,8 @@ table {
   border-radius: 10px;
   display: inline-block;
   background-color: #67727A;
-  box-shadow: 0px 4px rgba(0, 0, 0, 0.6)
+  box-shadow: 0px 4px rgba(0, 0, 0, 0.6);
+  visibility: visible;
 }
 
 #colors {
