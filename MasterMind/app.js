@@ -3,13 +3,17 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var http = require("http");
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
-var port = process.argv[2];
 var app = express();
+
+////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -19,7 +23,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, '/public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -40,5 +44,25 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-http.createServer(app).listen(port);
 module.exports = app;
+
+////////////////////////////////////////////////
+
+var express = require("express");
+var http = require("http");
+var websocket = require("ws");
+
+var port = process.argv[2];
+var app = express();
+
+app.use(express.static(__dirname + "/public"));
+
+app.get("/", indexRouter);
+app.get("/playbutton", indexRouter);
+
+var server = http.createServer(app);
+
+const wss = new websocket.Server({server});
+var websockets = {};
+
+server.listen(port);
