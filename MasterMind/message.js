@@ -1,7 +1,7 @@
 (function(exports){
 
     /* 
-     * Client to server: game is complete, the winner is ... 
+     * Client to server: game is complete, determine winner
      */
     exports.T_GAME_WON_BY = "GAME-WON-BY";             
     exports.O_GAME_WON_BY = {
@@ -10,7 +10,7 @@
     };
 
     /*
-     * Server to client: abort game (e.g. if second player exited the game) 
+     * Server to client: abort game (if second player exited the game) 
      */
     exports.O_GAME_ABORTED = {                          
         type: "GAME-ABORTED"
@@ -50,7 +50,6 @@
         type: exports.T_TARGET_PIN,
         data: null
     };
-    //exports.S_TARGET_WORD does not exist, as we always need to fill the data property
 
     /* 
      * Player B to server OR server to Player A: guessed pin 
@@ -60,7 +59,6 @@
         type: exports.T_MAKE_A_GUESS,
         data: null
     };
-    //exports.S_MAKE_A_GUESS does not exist, as data needs to be set
 
     /* 
      * Server to Player A & B: game over with result won/loss 
@@ -73,4 +71,3 @@
 
 
 }(typeof exports === "undefined" ? this.Messages = {} : exports));
-//if exports is undefined, we are on the client; else the server
