@@ -1,12 +1,4 @@
-
-
-:root {
-    --elementscolor: #D65C37;
-    --maincolor: #67727A;
-    --secondcolor: #6991AC;
-    --lightcolor: #C3D7DF;
-    --backgroundcolor: #F5F5F5;
-}
+@import "style.css";
 
 #generalstatistics p {
     text-align: right;
