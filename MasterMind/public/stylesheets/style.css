@@ -28,6 +28,13 @@ a {
 
 #menu {
   float: left;
+  position: relative;
+}
+
+#menu #el2 {
+  position: absolute;
+  left: -4px;
+  top: 50px;
 }
 
 table {

@@ -67,6 +67,27 @@ var gameSetup = function () {
         submitButton.style.marginTop = "15px";
     })
 
+    var menuel1 = document.getElementById("el1");
+    var menuel2 = document.getElementById("el2");
+
+    menuel1.addEventListener("click", function() {
+        if (menuel1.src.slice(-20) == "images/AbortGame.png") {
+            console.log("it works");
+        }
+        menuel1.src = "images/AbortGame.png";
+        menuel2.src = "images/FullScreenMode.png";
+
+        setTimeout(function(){
+            menuel1.src ="images/MenuSymbol.png";
+            menuel2.removeAttribute("src");
+        }, 5000);
+    })
+
+    menuel2.addEventListener("click", function() {
+        openFullscreen();
+        console.log("here");
+    })
+    
 
 }
 
@@ -164,4 +185,19 @@ var getRowColorCodeAndAddGuess = function (activeRow) {
     var pin4 = document.getElementById("pin" + String(4 * activeRow));
 
     gameState.addGuess(getColor(pin1), getColor(pin2), getColor(pin3), getColor(pin4));
+}
+
+
+function openFullscreen() {
+    var screen = document.getElementById("screen");
+
+    if (screen.requestFullscreen) {
+        screen.requestFullscreen();
+      } else if (screen.mozRequestFullScreen) { /* Firefox */
+        screen.mozRequestFullScreen();
+    } else if (screen.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+        screen.webkitRequestFullscreen();
+    } else if (screen.msRequestFullscreen) { /* IE/Edge */
+        screen.msRequestFullscreen();
+    }
 }
