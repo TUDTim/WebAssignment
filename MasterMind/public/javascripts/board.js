@@ -65,28 +65,35 @@ var gameSetup = function () {
     submitButton.addEventListener("mouseout", function () {
         submitButton.style.backgroundColor = "#67727A";
         submitButton.style.marginTop = "15px";
-    })
+    });
 
     var menuel1 = document.getElementById("el1");
     var menuel2 = document.getElementById("el2");
+    var resignButton = document.getElementById("resign");
 
     menuel1.addEventListener("click", function() {
-        if (menuel1.src.slice(-20) == "images/AbortGame.png") {
-            console.log("it works");
+        if (menuel1.src.slice(-10) == "Resign.png") {
+            
         }
-        menuel1.src = "images/AbortGame.png";
+        menuel1.src = "images/Resign.png";
         menuel2.src = "images/FullScreenMode.png";
+        resignButton.style.display = "inline-block";
 
         setTimeout(function(){
             menuel1.src ="images/MenuSymbol.png";
             menuel2.removeAttribute("src");
+            resignButton.style.display = "none";
         }, 5000);
-    })
+    });
 
     menuel2.addEventListener("click", function() {
         openFullscreen();
-        console.log("here");
-    })
+    });
+
+    resignButton.addEventListener("click", function() {
+        //return to home with game information popup#
+        location.href="splash.html";
+    });
     
 
 }

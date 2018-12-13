@@ -4,6 +4,7 @@ var uiactions = function() {
     var playButton = document.getElementById("playbutton");
 
     playButton.addEventListener("click", function() {
+        location.href="game.html";
         var userinput = document.getElementById("usernameinput");
         userinput.style.display = "none";
         playButton.style.marginTop = "120px";
