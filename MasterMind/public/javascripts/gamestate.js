@@ -26,6 +26,12 @@ var gameState = (function () {
         },
         getPlayerType: function() {
             return playerType;
+        },
+        setGuesses: function(theguesses) {
+            guesses = theguesses;
+        },
+        setIndications: function(theindications) {
+            indications = theindications;
         }
     };
 })();

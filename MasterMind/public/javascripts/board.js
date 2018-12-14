@@ -1,40 +1,85 @@
 var gameSetup = function () {
 
-    
+
     var colorClicked;
     var pinClicked;
     var colorCodeSet;
+    var waitingForPlayerB = false;
+    var bothPlayersJoined = false;
+    var g
 
-    gameState.setPlayerType("A");
+    gameState.setPlayerType("B");
     console.log(gameState.getPlayerType());
 
     var socket = new WebSocket("ws://localhost:3000");
     // renderGuessingBoard();
 
-    if (gameState.getPlayerType() == "B" || colorCodeSet == true) {
-        renderGuessingBoard();
-    } else if (gameState.getPlayerType() == "A") {
-        renderCodeToBeGuessedBoard();
-    }
-    
 
-    socket.onmessage = function(event) {
+
+
+    socket.onmessage = function (event) {
         var message = event.data;
-        var messageType = message.slice(0,10);
+        var messageType = message.slice(0, 10);
         var content = message.slice(10);
-        
+
 
         if (messageType == "indication") {
             console.log("indication recieved");
             var indication = JSON.parse(content);
             console.log(indication);
             gameState.addIndication(indication);
-            console.log(gameState.getIndications(0));+
+            console.log(gameState.getIndications(0)); +
+                showIndications();
+        }
+        if (message == "playerTypA") {
+            gameState.setPlayerType("A");
+            renderCodeToBeGuessedBoard();
+            setTimeout(function () {
+                alert("Waiting for opponent");
+            }, 100)
+            waitingForPlayerB = true;
+            socket.send("waitingforplayerB");
+        }
+        if (message == "playerTypB") {
+            gameState.setPlayerType("B");
+            renderGuessingBoard();
+            socket.send("playerBjoined");
+        }
+        if (message == "start") {
+            waitingForPlayerB = false;
+            bothPlayersJoined = true;
+        }
+        if (message == "colorCodeSet") {
+            colorCodeSet = true;
+        }
+        if (message == "playerBWins") {
+            alert("Player B won");
+            location.href = "splash.html";
+        }
+        if (messageType = "guessesToU") { 
+           gameState.setGuesses(JSON.parse(content));
+           showGuesses();
+        }
+        if (messageType = "indication") {
+            gameState.setIndications(JSON.parse(content));
             showIndications();
         }
 
     }
-    
+
+    while (waitingForPlayerB) {
+        setTimeout(function () {
+            console.log("hey");
+            socket.send("waitingforplayerB");
+        }, 2000)
+    }
+
+    // if (gameState.getPlayerType() == "B" || colorCodeSet == true) {
+    //     renderGuessingBoard();
+    // } else if (gameState.getPlayerType() == "A") {
+    //     renderCodeToBeGuessedBoard();
+    // }
+
     var colorTable = document.getElementById("colortable");
 
     colorTable.addEventListener("click", function () {
@@ -61,39 +106,50 @@ var gameSetup = function () {
                 }
             }
         } else if (gameState.getPlayerType() == "A"); {
-            if (colorClicked != null) {
-                var pin = document.getElementById(pinClicked);
-                if (pin != null) {
-                    setColor(pin, colorClicked);
-                    showPin(pin);
-                }
-                if (isRowFull(1)) {
-                    document.getElementById("submitbutton").style.display = "inline-block";
+            if (!colorCodeSet) {
+                if (colorClicked != null) {
+                    var pin = document.getElementById(pinClicked);
+                    if (pin != null) {
+                        setColor(pin, colorClicked);
+                        showPin(pin);
+                    }
+                    if (isRowFull(1)) {
+                        document.getElementById("submitbutton").style.display = "inline-block";
+
+                    }
 
                 }
-
             }
+
         }
-        
+
     });
+
+    // Submitbutton 
 
     var submitButton = document.getElementById("submitbutton");
 
     submitButton.addEventListener("click", function () {
-        if (gameState.getPlayerType() == "B" || colorCodeSet == true) {
+        if (bothPlayersJoined && gameState.getPlayerType() == "B") {
             var activeRow = 8 - gameState.getguessAmount();
             var guess = getRowColorCodeAndAddGuess(activeRow);
-            socket.send("codeGuess"+JSON.stringify(guess));
+            socket.send("codeGuess" + JSON.stringify(guess));
             gameState.addGuess(guess);
             submitButton.style.display = "none";
             showGuesses();
             showIndications();
         } else if (gameState.getPlayerType() == "A") {
-            var colorCode = getCodeToBeGuessed();
-            socket.send("colorCode"+JSON.stringify(colorCode));
-            colorCodeSet = true;
-            removeRowOne();
-            renderGuessingBoard();
+            if (bothPlayersJoined) {
+                var colorCode = getCodeToBeGuessed();
+                socket.send("colorCode" + JSON.stringify(colorCode));
+                colorCodeSet = true;
+                removeRowOne();
+                renderGuessingBoard();
+                document.getElementById("submitbutton").style.display = "none";
+            } else {
+                socket.send("waitingforplayerB");
+                alert("Still waiting for opponent");
+            }
         } else {
             alert("Opponent has not yet set the color code");
         }
@@ -113,30 +169,30 @@ var gameSetup = function () {
     var menuel2 = document.getElementById("el2");
     var resignButton = document.getElementById("resign");
 
-    menuel1.addEventListener("click", function() {
+    menuel1.addEventListener("click", function () {
         if (menuel1.src.slice(-10) == "Resign.png") {
-            
+
         }
         menuel1.src = "images/Resign.png";
         menuel2.src = "images/FullScreenMode.png";
         resignButton.style.display = "inline-block";
 
-        setTimeout(function(){
-            menuel1.src ="images/MenuSymbol.png";
+        setTimeout(function () {
+            menuel1.src = "images/MenuSymbol.png";
             menuel2.removeAttribute("src");
             resignButton.style.display = "none";
         }, 5000);
     });
 
-    menuel2.addEventListener("click", function() {
+    menuel2.addEventListener("click", function () {
         openFullscreen();
     });
 
-    resignButton.addEventListener("click", function() {
+    resignButton.addEventListener("click", function () {
         //return to home with game information popup#
-        location.href="splash.html";
+        location.href = "splash.html";
     });
-    
+
 
 }
 
@@ -223,9 +279,9 @@ var isRowFull = function (activeRow) {
             coloredPins++;
         }
     }
-    return (coloredPins == 4) 
+    return (coloredPins == 4)
 }
-    
+
 
 var getRowColorCodeAndAddGuess = function (activeRow) {
     var pin1 = document.getElementById("pin" + String(4 * activeRow - 3));
@@ -233,16 +289,16 @@ var getRowColorCodeAndAddGuess = function (activeRow) {
     var pin3 = document.getElementById("pin" + String(4 * activeRow - 1));
     var pin4 = document.getElementById("pin" + String(4 * activeRow));
 
-    return {c1: getColor(pin1), c2: getColor(pin2), c3: getColor(pin3), c4: getColor(pin4)};
+    return { c1: getColor(pin1), c2: getColor(pin2), c3: getColor(pin3), c4: getColor(pin4) };
 }
 
-var getCodeToBeGuessed = function() {
+var getCodeToBeGuessed = function () {
     var pin1 = document.getElementById("pin1");
     var pin2 = document.getElementById("pin2");
     var pin3 = document.getElementById("pin3");
     var pin4 = document.getElementById("pin4");
 
-    return {c1: getColor(pin1), c2: getColor(pin2), c3: getColor(pin3), c4: getColor(pin4)};
+    return { c1: getColor(pin1), c2: getColor(pin2), c3: getColor(pin3), c4: getColor(pin4) };
 }
 
 function openFullscreen() {
@@ -250,7 +306,7 @@ function openFullscreen() {
 
     if (screen.requestFullscreen) {
         screen.requestFullscreen();
-      } else if (screen.mozRequestFullScreen) { /* Firefox */
+    } else if (screen.mozRequestFullScreen) { /* Firefox */
         screen.mozRequestFullScreen();
     } else if (screen.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
         screen.webkitRequestFullscreen();
@@ -264,33 +320,33 @@ function renderGuessingBoard() {
     for (var r = 0; r < 8; r++) {
         var boardcell = "";
         var indicatorcell = "";
-    
+
         for (var c = 0; c < 4; c++) {
             boardcell += "<td id='pin" + space + "' data-pos='" + space + "'></td>";
             indicatorcell += "<td id='indicator" + space + "' data-pos='" + space + "'></td>";
             space++;
         }
-    
+
         $("#pintable").append("<tr id='row" + r + "'>" + boardcell + "</tr>");
         $("#indicatortable").append("<tr id='row" + r + "'>" + indicatorcell + "</tr>");
     }
-    document.getElementById("board").style.height = "640px"; 
+    document.getElementById("board").style.height = "640px";
 }
 
 function renderCodeToBeGuessedBoard() {
     var space = 1;
 
-        var boardcell = "";
-        var indicatorcell = "";
-    
-        for (var c = 0; c < 4; c++) {
-            boardcell += "<td id='pin" + space + "' data-pos='" + space + "'></td>";
-            indicatorcell += "<td id='indicator" + space + "' data-pos='" + space + "'></td>";
-            space++;
-        }
-    
-        $("#pintable").append("<tr id='row" + 1 + "'>" + boardcell + "</tr>");
-        $("#indicatortable").append("<tr id='irow" + 1 + "'>" + indicatorcell + "</tr>");
+    var boardcell = "";
+    var indicatorcell = "";
+
+    for (var c = 0; c < 4; c++) {
+        boardcell += "<td id='pin" + space + "' data-pos='" + space + "'></td>";
+        indicatorcell += "<td id='indicator" + space + "' data-pos='" + space + "'></td>";
+        space++;
+    }
+
+    $("#pintable").append("<tr id='row" + 1 + "'>" + boardcell + "</tr>");
+    $("#indicatortable").append("<tr id='irow" + 1 + "'>" + indicatorcell + "</tr>");
     document.getElementById("board").style.height = "80px"
 }
 

@@ -4,8 +4,11 @@ var game = function(gameID) {
     this.id = gameID;
     this.codeA = null;
     this.codeB = null;
-    this.globalGameState = {GuessesA: 0, GuessesB: 0, TimeA: 300, TimeB: 300, Winner: null}
-    
+    this.guesses = [];
+    this.indications = [];
+    this.guessAmount = 0;
+    this.gameState = "0";
+
 }
 game.prototype.getIndication = function (guess, colorCode) {
     var g = JSON.parse(JSON.stringify(guess));
@@ -44,16 +47,29 @@ game.prototype.getIndication = function (guess, colorCode) {
 game.prototype.getPlayerA = function() {
     return this.playerA;
 };
-game.prototype.setPlayerA = function(name) {
-    this.playerA = name;
+game.prototype.addPlayer = function(name) {
+    if (this.gameState == "0") {
+        this.playerA = name;
+        this.setGameState("1");
+        return "A";
+    } else if (this.gameState = "1") {
+        this.playerB = name;
+        this.setGameState("full");
+        return "B";
+    } 
 };
+game.prototype.setGameState = function(state) {
+    this.gameState = state;
+};
+game.prototype.isGameFull = function() {
+    return (this.gameState == "full")
+};
+
 game.prototype.getPlayerB = function() {
     return this.playerB;
 };
 
-game.prototype.setPlayerB = function(name) {
-    this.playerB = name;
-};
+
 
 game.prototype.getGameID = function() {
     return this.gameID;
@@ -70,5 +86,15 @@ game.prototype.setCodeB = function(color1, color2, color3, color4) {
 game.prototype.getGlobalGameState = function() {
     return this.globalGameState;
 };
+game.prototype.setPlayerA = function(name) {
+    this.playerA = name;
+};
+game.prototype.setPlayerB = function(name) {
+    this.playerB = name;
+};
+game.prototype.isColorCodeSet = function() {
+    return (this.codeA != null);
+}
+
 
 module.exports = game;

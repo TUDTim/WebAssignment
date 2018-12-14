@@ -34,12 +34,12 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -61,56 +61,119 @@ app.get("/play", indexRouter);
 
 var server = http.createServer(app);
 
-const wws = new websocket.Server({server});
+const wws = new websocket.Server({ server });
 
 var websockets = {};
 
-var connectionID = 0;
-var gameID = 0;
-var playerAWaiting;
 
-wws.on('connection', function(ws){
+var game = new Game(stats.gamesStarted);
+var connectionID = 0;
+
+
+wws.on('connection', function (ws) {
 
 
   let con = ws;
-
   con.id = connectionID++
 
-  var game = new Game(gameID++);
 
-  ws.on('message', function(message) {
+  let playerType = game.addPlayer(con);
 
-    var messageType = message.slice(0,9);
+  websockets[con.id] = game;
+
+  if (playerType == "A") {
+    ws.send("playerTypA");
+  } else if (playerType == "B") {
+    ws.send("playerTypB");
+  } 
+  console.log(game.isGameFull());
+
+  if (game.isGameFull()) {
+    otherGame = new Game(stats.gamesStarted++);
+  }
+
+
+ 
+  ws.on('message', function (message) {
+
+    var messageType = message.slice(0, 9);
     var content = message.slice(9);
-   
 
-    if (message == "waitingforotherplayer") {
-      if (playerAWaiting) {
-        console.log(game);
-        playerAWaiting = false;
-        window.location.assign("game.html");
-        ws.send("waitingforcodes");
-        console.log(playerAWaiting);
+    let gameObj = websockets[con.id];
 
-      } else {
-        playerAWaiting = true;
-        console.log(playerAWaiting);
+    console.log(gameObj);
+
+    let isPlayerA = (gameObj.getPlayerA() == con) ? true: false;
+
+    if (isPlayerA) {
+      if (message == "waitingforplayerB") {
+        console.log(gameObj.isGameFull());
+        if (gameObj.isGameFull()) {
+          ws.send("start")
+        }
+      }
+
+      if (messageType == "colorCode") {
+        console.log(message);
+        game.setCodeA(JSON.parse(content));
+        console.log(game.codeA);
+        ws.send("colorCodeSet");
+      }
+      if (message == "getdata") {
+          ws.send("guesses"+JSON.stringify(gameObj.guesses));
+          ws.send("indicat"+JSON.stringify(gameObj.indications));
+      }
+
+
+    } else {
+      if (messageType == "codeGuess") {
+        if (gameObj.isColorCodeSet()) {
+          var guess = JSON.parse(content);
+          gameObj.guesses[gameObj.guessAmount] = guess;
+          var indicationOut = game.getIndication(guess, game.codeA);
+          gameObj.indications[gameObj.guessAmount] = indicationOut;
+          gameObj.guessAmount++;
+          gameObj.playerA.send("guesses"+JSON.stringify(gameObj.guesses));
+          gameObj.playerA.send("indicat"+JSON.stringify(gameObj.indications));
+          if (indicationOut.black == 4) {
+            ws.send("playerBWins");
+            gameObj.playerA.send("playerBWins");
+          }
+          ws.send("indication" + JSON.stringify(indicationOut));
+        }
+      }
+      if (message == "playerBjoined") {
+        ws.send("start");
       }
     }
 
-    if (messageType == "colorCode") {
-      game.setCodeA(JSON.parse(content));
-      console.log(game.codeA);
+
+  })
+
+  ws.on('close', function (code) {
+    if (code == "1001") {
+      let gameObj = websockets[con.id];
+
+      gameObj.setGameState("aborted");
+      stats.gamesAborted++;
+
+      try {
+        gameObj.getPlayerA().close();
+        gameObj.setPlayerA(null);
+      } catch(e) {
+        console.log("PlayerA closing: "+e);
+      }
+  
+      try {
+        gameObj.getPlayerB().close();
+        gameObj.setPlayerB(null);
+      } catch(e) {
+        console.log("PlayerB closing: "+e);
+      }
     }
 
-    if (messageType == "codeGuess") {
-      var guess = JSON.parse(content);
-      var indicationOut = game.getIndication(guess, game.codeA);
-      ws.send("indication"+JSON.stringify(indicationOut));
-    }
+    
 
-  
-  
   })
 })
 
