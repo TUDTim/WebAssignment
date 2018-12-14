@@ -3,10 +3,15 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var http = require("http");
+var websocket = require("ws");
+var fs = require("fs");
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+var port = process.argv[2];
 var app = express();
 
 ////////////////////////////////////////////////
@@ -47,22 +52,53 @@ app.use(function(err, req, res, next) {
 module.exports = app;
 
 ////////////////////////////////////////////////
+var stats = require('./statistics');
+var Game = require('./game');
 
-var express = require("express");
-var http = require("http");
-var websocket = require("ws");
+app.get("/play", indexRouter);
 
-var port = process.argv[2];
-var app = express();
 
-app.use(express.static(__dirname + "/public"));
-
-app.get("/", indexRouter);
-app.get("/playbutton", indexRouter);
 
 var server = http.createServer(app);
 
-const wss = new websocket.Server({server});
-var websockets = {};
+var connectionID = 0;
+var gameID = 0;
+var playerAWaiting;
+
+const wws = new websocket.Server({server});
+
+wws.on('connection', function(ws){
+
+  let con = ws;
+
+  con.id = connectionID++
+
+  ws.on('message', function(message) {
+
+    console.log(message);
+
+    if (message == "waitingforotherplayer") {
+      if (playerAWaiting) {
+        var game = new Game(gameID++);
+        console.log(game);
+        playerAWaiting = false;
+        window.location.assign("game.html");
+        ws.send("waitingforcodes");
+        console.log(playerAWaiting);
+
+      } else {
+        playerAWaiting = true;
+        console.log(playerAWaiting);
+      }
+    }
+
+  
+  
+  })
+})
+
+
+
+
 
 server.listen(port);
