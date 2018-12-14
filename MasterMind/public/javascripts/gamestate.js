@@ -8,18 +8,19 @@ var gameState = (function () {
         getguessAmount: function () {
             return guessAmount;
         },
-        addGuess: function (color1, color2, color3, color4) {
-            guess = { c1: color1, c2: color2, c3: color3, c4: color4 }
+        addGuess: function (guess) {
             guesses[guessAmount] = guess;
-            // indications[guessAmount] = game.compareToA(guess);
             guessAmount++;
         },
         getGuess: function (guessNumber) {
             return guesses[guessNumber];
         },
-        getIndication: function (indicationNumber) {
+        getIndications: function (indicationNumber) {
             return indications[indicationNumber];
         }, 
+        addIndication: function (indication) {
+            indications[guessAmount - 1] = indication;
+        },
         setPlayerType: function (type) {
             playerType = type;
         },

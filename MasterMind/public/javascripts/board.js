@@ -18,7 +18,22 @@ var gameSetup = function () {
     }
     
 
+    socket.onmessage = function(event) {
+        var message = event.data;
+        var messageType = message.slice(0,10);
+        var content = message.slice(10);
+        
 
+        if (messageType == "indication") {
+            console.log("indication recieved");
+            var indication = JSON.parse(content);
+            console.log(indication);
+            gameState.addIndication(indication);
+            console.log(gameState.getIndications(0));+
+            showIndications();
+        }
+
+    }
     
     var colorTable = document.getElementById("colortable");
 
@@ -68,6 +83,8 @@ var gameSetup = function () {
         if (gameState.getPlayerType() == "B" || colorCodeSet == true) {
             var activeRow = 8 - gameState.getguessAmount();
             var guess = getRowColorCodeAndAddGuess(activeRow);
+            socket.send("codeGuess"+JSON.stringify(guess));
+            gameState.addGuess(guess);
             submitButton.style.display = "none";
             showGuesses();
             showIndications();
@@ -177,9 +194,9 @@ var showIndications = function () {
     var index = 0;
     var rowcount = 8;
 
-    while (gameState.getIndication(index) != null) {
-        var numBlack = gameState.getIndication(index).black;
-        var numWhite = gameState.getIndication(index).white;
+    while (gameState.getIndications(index) != null) {
+        var numBlack = gameState.getIndications(index).black;
+        var numWhite = gameState.getIndications(index).white;
 
         for (var i = 0; i < numBlack; i++) {
             var black = document.getElementById("indicator" + String(4 * rowcount - (3 - i)));
@@ -216,7 +233,7 @@ var getRowColorCodeAndAddGuess = function (activeRow) {
     var pin3 = document.getElementById("pin" + String(4 * activeRow - 1));
     var pin4 = document.getElementById("pin" + String(4 * activeRow));
 
-    gameState.addGuess(getColor(pin1), getColor(pin2), getColor(pin3), getColor(pin4));
+    return {c1: getColor(pin1), c2: getColor(pin2), c3: getColor(pin3), c4: getColor(pin4)};
 }
 
 var getCodeToBeGuessed = function() {
@@ -273,12 +290,14 @@ function renderCodeToBeGuessedBoard() {
         }
     
         $("#pintable").append("<tr id='row" + 1 + "'>" + boardcell + "</tr>");
-        $("#indicatortable").append("<tr id='row" + 1 + "'>" + indicatorcell + "</tr>");
+        $("#indicatortable").append("<tr id='irow" + 1 + "'>" + indicatorcell + "</tr>");
     document.getElementById("board").style.height = "80px"
 }
 
 function removeRowOne() {
     var elem = document.getElementById("row1");
     elem.parentNode.removeChild(elem);
+    var ielem = document.getElementById("irow1");
+    ielem.parentNode.removeChild(ielem);
     return false;
 }

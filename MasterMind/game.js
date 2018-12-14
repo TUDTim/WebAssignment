@@ -58,15 +58,12 @@ game.prototype.setPlayerB = function(name) {
 game.prototype.getGameID = function() {
     return this.gameID;
 };
-game.prototype.compareToCodeA = function(guess) {
-    return getIndication(guess, this.codeA);
+game.prototype.setCodeA = function(codeSent) {
+    this.codeA = codeSent;
 };
-game.prototype.compareToCodeB = function(guess) {
-    return getIndication(guess, this.codeB);
-};
-game.prototype.setCodeA = function(color1, color2, color3, color4) {
-    this.codeA = {c1: color1, c2: color2, c3: color3, c4: color4};
-};
+game.prototype.getPlayerACode = function() {
+    this.codeA;
+}
 game.prototype.setCodeB = function(color1, color2, color3, color4) {
     this.codeB = {c1: color1, c2: color2, c3: color3, c4: color4};
 };

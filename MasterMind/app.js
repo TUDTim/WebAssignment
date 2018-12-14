@@ -81,6 +81,7 @@ wws.on('connection', function(ws){
   ws.on('message', function(message) {
 
     var messageType = message.slice(0,9);
+    var content = message.slice(9);
    
 
     if (message == "waitingforotherplayer") {
@@ -98,8 +99,14 @@ wws.on('connection', function(ws){
     }
 
     if (messageType == "colorCode") {
-      var content = message.slice(9);
       game.setCodeA(JSON.parse(content));
+      console.log(game.codeA);
+    }
+
+    if (messageType == "codeGuess") {
+      var guess = JSON.parse(content);
+      var indicationOut = game.getIndication(guess, game.codeA);
+      ws.send("indication"+JSON.stringify(indicationOut));
     }
 
   
