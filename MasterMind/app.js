@@ -61,25 +61,30 @@ app.get("/play", indexRouter);
 
 var server = http.createServer(app);
 
+const wws = new websocket.Server({server});
+
+var websockets = {};
+
 var connectionID = 0;
 var gameID = 0;
 var playerAWaiting;
 
-const wws = new websocket.Server({server});
-
 wws.on('connection', function(ws){
+
 
   let con = ws;
 
   con.id = connectionID++
 
+  var game = new Game(gameID++);
+
   ws.on('message', function(message) {
 
-    console.log(message);
+    var messageType = message.slice(0,9);
+   
 
     if (message == "waitingforotherplayer") {
       if (playerAWaiting) {
-        var game = new Game(gameID++);
         console.log(game);
         playerAWaiting = false;
         window.location.assign("game.html");
@@ -92,13 +97,15 @@ wws.on('connection', function(ws){
       }
     }
 
+    if (messageType == "colorCode") {
+      var content = message.slice(9);
+      game.setCodeA(JSON.parse(content));
+    }
+
   
   
   })
 })
-
-
-
 
 
 server.listen(port);

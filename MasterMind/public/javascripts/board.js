@@ -73,8 +73,10 @@ var gameSetup = function () {
             showIndications();
         } else if (gameState.getPlayerType() == "A") {
             var colorCode = getCodeToBeGuessed();
-            socket.send(JSON.stringify(colorCode));
+            socket.send("colorCode"+JSON.stringify(colorCode));
             colorCodeSet = true;
+            removeRowOne();
+            renderGuessingBoard();
         } else {
             alert("Opponent has not yet set the color code");
         }
@@ -166,7 +168,6 @@ var setColor = function (element, color) {
 }
 
 var getColor = function (element) {
-    console.log(element);
     var colorString = element.style.backgroundColor;
     return colorString.slice(6, -1);
 }
@@ -241,6 +242,7 @@ function openFullscreen() {
     }
 }
 function renderGuessingBoard() {
+
     var space = 1;
     for (var r = 0; r < 8; r++) {
         var boardcell = "";
@@ -255,6 +257,7 @@ function renderGuessingBoard() {
         $("#pintable").append("<tr id='row" + r + "'>" + boardcell + "</tr>");
         $("#indicatortable").append("<tr id='row" + r + "'>" + indicatorcell + "</tr>");
     }
+    document.getElementById("board").style.height = "640px"; 
 }
 
 function renderCodeToBeGuessedBoard() {
@@ -272,4 +275,10 @@ function renderCodeToBeGuessedBoard() {
         $("#pintable").append("<tr id='row" + 1 + "'>" + boardcell + "</tr>");
         $("#indicatortable").append("<tr id='row" + 1 + "'>" + indicatorcell + "</tr>");
     document.getElementById("board").style.height = "80px"
+}
+
+function removeRowOne() {
+    var elem = document.getElementById("row1");
+    elem.parentNode.removeChild(elem);
+    return false;
 }
