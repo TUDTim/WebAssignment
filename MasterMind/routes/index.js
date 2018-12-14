@@ -7,7 +7,7 @@ router.get("/", function (req, res) {
 });
 
 /* Pressing Play */
-router.get("/playbutton", function(req, res) {
+router.get("/play", function(req, res) {
     res.sendFile("game.html", {root: "./public"});
 });
 

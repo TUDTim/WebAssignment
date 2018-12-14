@@ -1,27 +1,25 @@
 var gameSetup = function () {
 
-    var space = 1;
+    
     var colorClicked;
     var pinClicked;
+    var colorCodeSet;
 
-    for (var r = 0; r < 8; r++) {
-        var boardcell = "";
-        var indicatorcell = "";
+    gameState.setPlayerType("A");
+    console.log(gameState.getPlayerType());
 
-        for (var c = 0; c < 4; c++) {
-            boardcell += "<td id='pin" + space + "' data-pos='" + space + "'></td>";
-            indicatorcell += "<td id='indicator" + space + "' data-pos='" + space + "'></td>";
-            space++;
-        }
+    var socket = new WebSocket("ws://localhost:3000");
+    // renderGuessingBoard();
 
-        $("#pintable").append("<tr id='row" + r + "'>" + boardcell + "</tr>");
-        $("#indicatortable").append("<tr id='row" + r + "'>" + indicatorcell + "</tr>");
+    if (gameState.getPlayerType() == "B" || colorCodeSet == true) {
+        renderGuessingBoard();
+    } else if (gameState.getPlayerType() == "A") {
+        renderCodeToBeGuessedBoard();
     }
-
-    showGuesses();
-    showIndications();
+    
 
 
+    
     var colorTable = document.getElementById("colortable");
 
     colorTable.addEventListener("click", function () {
@@ -31,30 +29,55 @@ var gameSetup = function () {
     var pinTable = document.getElementById("pintable");
 
     pinTable.addEventListener("click", function () {
+
+
         pinClicked = event.target.id;
         var rowClicked = event.target.parentElement.id;
 
-        if (colorClicked != null && rowClicked == "row" + String(7 - gameState.getguessAmount())) {
-            var pin = document.getElementById(pinClicked);
-            if (pin != null) {
-                setColor(pin, colorClicked);
-                showPin(pin);
+        if (gameState.getPlayerType() == "B") {
+            if (colorClicked != null && rowClicked == "row" + String(7 - gameState.getguessAmount())) {
+                var pin = document.getElementById(pinClicked);
+                if (pin != null) {
+                    setColor(pin, colorClicked);
+                    showPin(pin);
+                }
+                if (isRowFull(8 - gameState.getguessAmount())) {
+                    document.getElementById("submitbutton").style.display = "inline-block";
+                }
+            }
+        } else if (gameState.getPlayerType() == "A"); {
+            if (colorClicked != null) {
+                var pin = document.getElementById(pinClicked);
+                if (pin != null) {
+                    setColor(pin, colorClicked);
+                    showPin(pin);
+                }
+                if (isRowFull(1)) {
+                    document.getElementById("submitbutton").style.display = "inline-block";
+
+                }
+
             }
         }
         
-        if (isRowFull(8 - gameState.getguessAmount())) {
-            document.getElementById("submitbutton").style.display = "inline-block";
-        }
     });
 
     var submitButton = document.getElementById("submitbutton");
 
     submitButton.addEventListener("click", function () {
-        var activeRow = 8 - gameState.getguessAmount();
-        var guess = getRowColorCodeAndAddGuess(activeRow);
-        submitButton.style.display = "none";
-        showGuesses();
-        showIndications();
+        if (gameState.getPlayerType() == "B" || colorCodeSet == true) {
+            var activeRow = 8 - gameState.getguessAmount();
+            var guess = getRowColorCodeAndAddGuess(activeRow);
+            submitButton.style.display = "none";
+            showGuesses();
+            showIndications();
+        } else if (gameState.getPlayerType() == "A") {
+            var colorCode = getCodeToBeGuessed();
+            socket.send(JSON.stringify(colorCode));
+            colorCodeSet = true;
+        } else {
+            alert("Opponent has not yet set the color code");
+        }
     });
 
     submitButton.addEventListener("mouseover", function () {
@@ -143,6 +166,7 @@ var setColor = function (element, color) {
 }
 
 var getColor = function (element) {
+    console.log(element);
     var colorString = element.style.backgroundColor;
     return colorString.slice(6, -1);
 }
@@ -183,7 +207,7 @@ var isRowFull = function (activeRow) {
     }
     return (coloredPins == 4) 
 }
-
+    
 
 var getRowColorCodeAndAddGuess = function (activeRow) {
     var pin1 = document.getElementById("pin" + String(4 * activeRow - 3));
@@ -194,6 +218,14 @@ var getRowColorCodeAndAddGuess = function (activeRow) {
     gameState.addGuess(getColor(pin1), getColor(pin2), getColor(pin3), getColor(pin4));
 }
 
+var getCodeToBeGuessed = function() {
+    var pin1 = document.getElementById("pin1");
+    var pin2 = document.getElementById("pin2");
+    var pin3 = document.getElementById("pin3");
+    var pin4 = document.getElementById("pin4");
+
+    return {c1: getColor(pin1), c2: getColor(pin2), c3: getColor(pin3), c4: getColor(pin4)};
+}
 
 function openFullscreen() {
     var screen = document.getElementById("screen");
@@ -207,4 +239,37 @@ function openFullscreen() {
     } else if (screen.msRequestFullscreen) { /* IE/Edge */
         screen.msRequestFullscreen();
     }
+}
+function renderGuessingBoard() {
+    var space = 1;
+    for (var r = 0; r < 8; r++) {
+        var boardcell = "";
+        var indicatorcell = "";
+    
+        for (var c = 0; c < 4; c++) {
+            boardcell += "<td id='pin" + space + "' data-pos='" + space + "'></td>";
+            indicatorcell += "<td id='indicator" + space + "' data-pos='" + space + "'></td>";
+            space++;
+        }
+    
+        $("#pintable").append("<tr id='row" + r + "'>" + boardcell + "</tr>");
+        $("#indicatortable").append("<tr id='row" + r + "'>" + indicatorcell + "</tr>");
+    }
+}
+
+function renderCodeToBeGuessedBoard() {
+    var space = 1;
+
+        var boardcell = "";
+        var indicatorcell = "";
+    
+        for (var c = 0; c < 4; c++) {
+            boardcell += "<td id='pin" + space + "' data-pos='" + space + "'></td>";
+            indicatorcell += "<td id='indicator" + space + "' data-pos='" + space + "'></td>";
+            space++;
+        }
+    
+        $("#pintable").append("<tr id='row" + 1 + "'>" + boardcell + "</tr>");
+        $("#indicatortable").append("<tr id='row" + 1 + "'>" + indicatorcell + "</tr>");
+    document.getElementById("board").style.height = "80px"
 }

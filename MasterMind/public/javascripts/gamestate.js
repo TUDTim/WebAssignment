@@ -2,6 +2,7 @@ var gameState = (function () {
     var guessAmount = 0;
     var guesses = [];
     var indications = [];
+    var playerType = null;
 
     return {
         getguessAmount: function () {
@@ -18,6 +19,12 @@ var gameState = (function () {
         },
         getIndication: function (indicationNumber) {
             return indications[indicationNumber];
+        }, 
+        setPlayerType: function (type) {
+            playerType = type;
+        },
+        getPlayerType: function() {
+            return playerType;
         }
     };
 })();
